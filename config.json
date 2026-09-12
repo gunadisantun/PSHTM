@@ -1,0 +1,34 @@
+{
+  "brand": "PSHTM IKA FH UNDIP",
+  "timezone": "Asia/Jakarta",
+  "max_age_hours": 36,
+  "history_days": 14,
+  "scheduled_hour_wib": 7,
+  "feeds": [
+    "https://news.google.com/rss/search?q=%28%22data+protection%22+OR+privacy+OR+%22personal+data%22+OR+cybersecurity%29+when%3A1d&hl=en-US&gl=US&ceid=US%3Aen",
+    "https://news.google.com/rss/search?q=%28%22artificial+intelligence%22+OR+%22AI+regulation%22+OR+%22technology+law%22+OR+platform+regulation%29+when%3A1d&hl=en-US&gl=US&ceid=US%3Aen",
+    "https://news.google.com/rss/search?q=%28%22data+pribadi%22+OR+%22UU+PDP%22+OR+Komdigi+OR+%22keamanan+siber%22+OR+%22kecerdasan+artifisial%22%29+when%3A1d&hl=id&gl=ID&ceid=ID%3Aid"
+  ],
+  "keywords": {
+    "data protection": 12,
+    "privacy": 10,
+    "personal data": 12,
+    "data pribadi": 12,
+    "pdp": 12,
+    "gdpr": 12,
+    "breach": 11,
+    "kebocoran": 11,
+    "cyber": 8,
+    "ransomware": 10,
+    "regulation": 8,
+    "regulator": 8,
+    "law": 7,
+    "court": 7,
+    "ai": 6,
+    "artificial intelligence": 8,
+    "kecerdasan artifisial": 8,
+    "platform": 5,
+    "media": 4,
+    "komdigi": 10
+  }
+}
