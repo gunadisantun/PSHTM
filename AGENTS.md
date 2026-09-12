@@ -2,7 +2,8 @@
 
 - This repository is dedicated to PSHTM Instagram automation only.
 - Do not add Vercel, Next.js, or unrelated application code.
-- Preserve `assets/logo-pshtm.png` as the canonical PSHTM logo. Never redraw or regenerate the logo with AI.
+- Do not use or generate a PSHTM logo in daily posts.
+- Use the text identity at the bottom of every post: `Pusat Studi Hukum, Teknologi dan Media` and `IKA FH UNDIP`.
 - Default output size is 1080x1350 (4:5).
 - Default timezone is Asia/Jakarta.
 - Scheduled publishing time is 07:00 WIB.
