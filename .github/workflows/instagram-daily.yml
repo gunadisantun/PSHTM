@@ -1,0 +1,104 @@
+name: Daily Instagram Post
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # 07:00 WIB
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Generate content without posting to Instagram"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pshtm-daily-instagram
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Load recent history
+        env:
+          REPO: ${{ github.repository }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/pshtm"
+          HISTORY_URL="https://raw.githubusercontent.com/${REPO}/ig-media/history.json"
+          if ! curl -fsSL "$HISTORY_URL" -o "$RUNNER_TEMP/pshtm/history.json"; then
+            echo '[]' > "$RUNNER_TEMP/pshtm/history.json"
+          fi
+
+      - name: Generate post
+        run: |
+          python src/generate.py \
+            --history "$RUNNER_TEMP/pshtm/history.json" \
+            --out "$RUNNER_TEMP/pshtm/out"
+
+      - name: Publish asset to ig-media branch
+        run: |
+          DATE_PATH="$(TZ=Asia/Jakarta date +%Y/%m/%d)"
+          DATE_FILE="$(TZ=Asia/Jakarta date +%Y-%m-%d)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code origin refs/heads/ig-media >/dev/null 2>&1; then
+            git fetch origin ig-media
+            git switch -C ig-media origin/ig-media
+          else
+            git switch --orphan ig-media
+            git rm -rf . >/dev/null 2>&1 || true
+          fi
+          mkdir -p "posts/$DATE_PATH"
+          cp "$RUNNER_TEMP/pshtm/out/post.jpg" "posts/$DATE_PATH/post.jpg"
+          cp "$RUNNER_TEMP/pshtm/out/meta.json" "posts/$DATE_PATH/meta.json"
+          cp "$RUNNER_TEMP/pshtm/out/history.next.json" history.json
+          git add posts history.json
+          git commit -m "PSHTM daily post ${DATE_FILE}" || true
+          git push origin HEAD:ig-media
+          echo "IMAGE_URL=https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/ig-media/posts/${DATE_PATH}/post.jpg" >> "$GITHUB_ENV"
+          echo "META_FILE=$RUNNER_TEMP/pshtm/out/meta.json" >> "$GITHUB_ENV"
+
+      - name: Wait until image is reachable
+        run: |
+          for i in $(seq 1 12); do
+            if curl -fsI "$IMAGE_URL" >/dev/null; then exit 0; fi
+            sleep 5
+          done
+          echo "Image URL not reachable: $IMAGE_URL"
+          exit 1
+
+      - name: Post to Instagram
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          META_GRAPH_API_VERSION: v26.0
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "Dry run: Instagram publishing skipped."
+            exit 0
+          fi
+          if [ -z "$IG_USER_ID" ] || [ -z "$IG_ACCESS_TOKEN" ]; then
+            echo "Instagram secrets belum diisi. Asset tetap dibuat."
+            exit 0
+          fi
+          python src/publish.py --meta "$META_FILE" --image-url "$IMAGE_URL"
