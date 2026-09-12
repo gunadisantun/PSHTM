@@ -53,6 +53,7 @@ jobs:
           python src/generate.py \
             --history "$RUNNER_TEMP/pshtm/history.json" \
             --out "$RUNNER_TEMP/pshtm/out"
+          cp src/publish.py "$RUNNER_TEMP/pshtm/publish.py"
 
       - name: Publish asset to ig-media branch
         run: |
@@ -101,4 +102,4 @@ jobs:
             echo "Instagram secrets belum diisi. Asset tetap dibuat."
             exit 0
           fi
-          python src/publish.py --meta "$META_FILE" --image-url "$IMAGE_URL"
+          python "$RUNNER_TEMP/pshtm/publish.py" --meta "$META_FILE" --image-url "$IMAGE_URL"
