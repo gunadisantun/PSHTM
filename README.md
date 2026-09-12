@@ -7,7 +7,7 @@ Alur utama:
 2. Agent mengambil berita terbaru dari RSS publik.
 3. Berita diberi skor berdasarkan relevansi hukum, teknologi, media, privasi, keamanan siber, dan AI.
 4. Agent menghindari topik yang mirip dengan posting 14 hari terakhir.
-5. Agent membuat visual 1080x1350 dengan identitas PSHTM dan logo asli dari `assets/logo-pshtm.png`.
+5. Agent membuat visual 1080x1350 dengan identitas teks di footer: `Pusat Studi Hukum, Teknologi dan Media` dan `IKA FH UNDIP`.
 6. Mode awal adalah dry-run, jadi tidak mem-posting ke Instagram sampai kredensial Meta disiapkan.
 
 ## GitHub Secrets
